@@ -1,0 +1,102 @@
+import {gql} from '@apollo/client'
+
+export const GET_ONE_PRODUCT= gql`
+query getProduct($id:ID!){
+  product(id:$id){
+    id
+    name
+    image
+    slug
+    price
+    salePrice
+    type
+    status
+    description
+    size{
+      edges{
+        node{
+          title
+          value
+        }
+      }
+    }
+    gallery{
+      edges{
+        node{
+          title
+          url
+          color{
+            edges{
+              node{
+                title
+                value
+              }
+            }
+          }
+        }
+      }
+    }
+    color{
+      edges{
+        node{
+          title
+          value
+        }
+      }
+    }
+    
+  }
+}
+`
+
+export const GET_PRODUCTS= gql`
+query {
+    allProducts{
+      edges{
+        node{
+          id
+          image
+          slug
+          type
+          status
+          price
+          salePrice
+          name
+          size{
+            edges{
+              node{
+                title
+                value
+              }
+            }
+          }
+          color{
+            edges{
+              node{
+                title
+                value
+              }
+            }
+          }
+          gallery{
+            edges{
+              node{
+                color{
+                  edges{
+                    node{
+                      title
+                      value
+                    }
+                  }
+                }
+                id
+                title
+                url
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
