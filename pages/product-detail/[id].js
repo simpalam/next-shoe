@@ -1,21 +1,21 @@
-import { Container, Stack, Typography, Grid,Button } from "@material-ui/core";
-import React, { useState,useEffect } from "react";
+import { Container, Stack, Typography, Grid, Button } from "@material-ui/core";
+import React, { useState, useEffect } from "react";
 import Page from "../../components/Page";
 
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
-import { Carousel } from 'react-responsive-carousel';
+import { Carousel } from "react-responsive-carousel";
 
 const responsive = {
   superLargeDesktop: {
     // the naming can be any, depends on you.
     breakpoint: { max: 4000, min: 3000 },
     items: 2,
-    slidesToSlide: 2
+    slidesToSlide: 2,
   },
   desktop: {
     breakpoint: { max: 3000, min: 1024 },
     items: 2,
-    slidesToSlide: 2
+    slidesToSlide: 2,
   },
   tablet: {
     breakpoint: { max: 1024, min: 464 },
@@ -38,69 +38,72 @@ import ProductImageCarouselCard from "../../components/_dashboard/products/Produ
 import PdDetail from "../../components/productdetails/pdDetail";
 import CustomerForm from "../../components/productdetails/customerform";
 
-import Stepper from '@material-ui/core/Stepper';
-import Step from '@material-ui/core/Step';
-import StepButton from '@material-ui/core/StepButton';
+import Stepper from "@material-ui/core/Stepper";
+import Step from "@material-ui/core/Step";
+import StepButton from "@material-ui/core/StepButton";
 import Checkout from "../../components/productdetails/checkout";
 import client from "../../apollo-client";
 import { GET_ONE_PRODUCT } from "../../graphql/query/products.query";
-
+import { useRouter } from "next/router";
 
 function getSteps() {
-  return ['Product details', 'Delivery details', 'Payment method'];
+  return ["Product details", "Delivery details", "Payment method"];
 }
 
-
-export async function getServerSideProps(context){
-  const {data,loading,error} = await client.query({
-      query:GET_ONE_PRODUCT,
-      variables:{id:context.params.id}
+export async function getServerSideProps(context) {
+  const { data, loading, error } = await client.query({
+    query: GET_ONE_PRODUCT,
+    variables: { id: context.params.id },
   });
 
-  if(loading){
-      return <h2>Loading ... Please wait.</h2>
-    }
-    if(error){
-      console.error(error);
-      return null
-    }
+  if (loading) {
+    return <h2>Loading ... Please wait.</h2>;
+  }
+  if (error) {
+    console.error(error);
+    return null;
+  }
 
-    return {
-        props:{
-            product:data.product
-        }
-    }
+  return {
+    props: {
+      product: data.product,
+    },
+  };
 }
 
-export default function ProductDertail({product}) {
+export default function ProductDertail({ product }) {
+  const router = useRouter();
 
-   const [productdetail,setProductdetail]=useState({
-     name:product.name,
-     price:product.salePrice,
-     colorname:'',
-     colorvalue:'',
-     size:7,
-     image:''
-   });
+  const handleLogin = () => {
+    router.push("login");
+  };
 
-   const [cstdetail,setCstdetail]=useState({
-    price:product.salePrice,
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    address:''
-   });
+  const [productdetail, setProductdetail] = useState({
+    name: product.name,
+    price: product.salePrice,
+    colorname: "",
+    colorvalue: "",
+    size: 7,
+    image: "",
+  });
 
-   
-  const [login,setLogin]=useState('');
+  const [cstdetail, setCstdetail] = useState({
+    price: product.salePrice,
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    address: "",
+  });
+
+  const [login, setLogin] = useState("");
 
   useEffect(() => {
     // if (isOpenSidebar) {
     //   onCloseSidebar();
     // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    setLogin(localStorage.getItem('login'))
+    setLogin(localStorage.getItem("login"));
   }, [login]);
 
   const [activeStep, setActiveStep] = React.useState(0);
@@ -111,7 +114,6 @@ export default function ProductDertail({product}) {
     return getSteps().length;
   };
 
-  
   const isStepOptional = (step) => {
     return step === 1;
   };
@@ -157,7 +159,6 @@ export default function ProductDertail({product}) {
 
     setActiveStep(newActiveStep);
     console.log(productdetail);
-
   };
 
   const handleBack = () => {
@@ -197,134 +198,135 @@ export default function ProductDertail({product}) {
     return completed.has(step);
   }
 
-  const pdDetail = (productdetail) =>{
-    if(productdetail){
-      setProductdetail(prevState=>({
+  const pdDetail = (productdetail) => {
+    if (productdetail) {
+      setProductdetail((prevState) => ({
         ...prevState,
-        colorname:productdetail.colorname,
-        colorvalue:productdetail.colorvalue,
-        size:productdetail.size,
-        image:productdetail.image
+        colorname: productdetail.colorname,
+        colorvalue: productdetail.colorvalue,
+        size: productdetail.size,
+        image: productdetail.image,
       }));
-       }
-  }
+    }
+  };
 
   const csDetail = (cstdetail) => {
-    if(cstdetail){
-      setCstdetail(prevState=>({
+    if (cstdetail) {
+      setCstdetail((prevState) => ({
         ...prevState,
-        firstName:cstdetail.firstName,
-        lastName:cstdetail.lastName,
-        email:cstdetail.email,
-        phone:cstdetail.phone,
-        address:cstdetail.address
+        firstName: cstdetail.firstName,
+        lastName: cstdetail.lastName,
+        email: cstdetail.email,
+        phone: cstdetail.phone,
+        address: cstdetail.address,
       }));
       handleNext();
       console.log(cstdetail);
     }
-  }
+  };
 
-  
-function getStepContent(step) {
-  switch (step) {
-    case 0:
-      return <PdDetail pdDetail={pdDetail} product={product} />;
-    case 1:
-      return <CustomerForm csDetail={csDetail} />;
-    case 2:
-      return <Checkout productdetail={productdetail} cstdetail={cstdetail} />;
-    default:
-      return 'Unknown step';
+  function getStepContent(step) {
+    switch (step) {
+      case 0:
+        return <PdDetail pdDetail={pdDetail} product={product} />;
+      case 1:
+        return <CustomerForm csDetail={csDetail} />;
+      case 2:
+        return <Checkout productdetail={productdetail} cstdetail={cstdetail} />;
+      default:
+        return "Unknown step";
+    }
   }
-}
 
   return (
     <div>
       <Page title="Product Detail">
         <Container>
-        
           <Stepper alternativeLabel nonLinear activeStep={activeStep}>
-        {steps.map((label, index) => {
-          const stepProps = {};
-          const buttonProps = {};
-         
-          return (
-            <Step key={label} {...stepProps}>
-              <StepButton
-                onClick={handleStep(index)}
-                completed={isStepComplete(index)}
-                {...buttonProps}
-              >
-                {label}
-              </StepButton>
-            </Step>
-          );
-        })}
-      </Stepper>
-      <div>
-        {allStepsCompleted() ? (
-          <div>
-            <Typography >
-              All steps completed - you&apos;re finished
-            </Typography>
-          
-          </div>
-        ) : (
-          <div>
-            <Typography >{getStepContent(activeStep)}</Typography>
-            <div>
-              <Button disabled={activeStep === 0} onClick={handleBack} >
-                Back
-              </Button>
-              {
-                activeStep === 2 || activeStep === 1 ? (
-                  <div>
-                    </div>
-                
+            {steps.map((label, index) => {
+              const stepProps = {};
+              const buttonProps = {};
 
-                ) : (
-                  <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleNext}
-                  
-                >
-                  Next
-                </Button>
-                )
-              }
-            
-             
-              {activeStep !== steps.length &&
-                (completed.has(activeStep) ? (
-                  <Typography variant="caption" >
-                    Step {activeStep + 1} already completed
-                  </Typography>
-                ) : (
-                 <div>
-                    {activeStep === 2 && login === 'true' ? (
-                      // <Typography>
-                      //   {/* Place order. */}
-                      // </Typography>
-                        <Button variant="contained" color="primary" onClick={handleComplete}>
-                         Place Order
-                        </Button>
+              return (
+                <Step key={label} {...stepProps}>
+                  <StepButton
+                    onClick={handleStep(index)}
+                    completed={isStepComplete(index)}
+                    {...buttonProps}
+                  >
+                    {label}
+                  </StepButton>
+                </Step>
+              );
+            })}
+          </Stepper>
+          <div>
+            {allStepsCompleted() ? (
+              <div>
+                <Typography>
+                  All steps completed - you&apos;re finished
+                </Typography>
+              </div>
+            ) : (
+              <div>
+                <Typography>{getStepContent(activeStep)}</Typography>
+                <div>
+                  <Button disabled={activeStep === 0} onClick={handleBack}>
+                    Back
+                  </Button>
+                  {activeStep === 2 || activeStep === 1 ? (
+                    <div></div>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleNext}
+                    >
+                      Next
+                    </Button>
+                  )}
 
+                  {activeStep !== steps.length &&
+                    (completed.has(activeStep) ? (
+                      <Typography variant="caption">
+                        Step {activeStep + 1} already completed
+                      </Typography>
                     ) : (
                       <div>
-                        </div>
-                    )}
-                  
-                   </div>
-                 
-                ))}
-            </div>
+                        {activeStep === 2 ? (
+                          // <Typography>
+                          //   {/* Place order. */}
+                          // </Typography>
+                          <div>
+                            {login === "true" ? (
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleComplete}
+                              >
+                                Place Order
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleLogin}
+                              >
+                                Please Login
+                              </Button>
+                            )}
+                          </div>
+                        ) : (
+                          <div></div>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
           </div>
-        )}
-        </div>
-         </Container>
+        </Container>
       </Page>
-     
     </div>
   );
 }

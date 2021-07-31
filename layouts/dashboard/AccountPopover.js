@@ -1,5 +1,5 @@
 import { Icon } from '@iconify/react';
-import { useRef, useState } from 'react';
+import { useRef, useState,useEffect } from 'react';
 import homeFill from '@iconify/icons-eva/home-fill';
 import personFill from '@iconify/icons-eva/person-fill';
 import settings2Fill from '@iconify/icons-eva/settings-2-fill';
@@ -11,6 +11,7 @@ import { Button, Box, Divider, MenuItem, Typography, Avatar, IconButton } from '
 import MenuPopover from '../../components/MenuPopover';
 //
 import account from '../../_mocks_/account';
+import { useRouter } from 'next/router';
 
 // ----------------------------------------------------------------------
 
@@ -38,12 +39,32 @@ export default function AccountPopover() {
   const anchorRef = useRef(null);
   const [open, setOpen] = useState(false);
 
+  const router = useRouter();
+
+   
+  const [login,setLogin]=useState('');
+
+  useEffect(() => {
+    // if (isOpenSidebar) {
+    //   onCloseSidebar();
+    // }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    setLogin(localStorage.getItem('login'))
+  }, [login]);
+
   const handleOpen = () => {
     setOpen(true);
   };
   const handleClose = () => {
     setOpen(false);
   };
+
+  const logOut = () => {
+    localStorage.setItem('login','false');
+       localStorage.setItem('userid','null');
+       localStorage.setItem('username','null');
+       router.reload();
+  }
 
   return (
     <>
@@ -77,17 +98,34 @@ export default function AccountPopover() {
         sx={{ width: 220 }}
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
-          <Typography variant="subtitle1" noWrap>
-            {account.displayName}
+          {
+            login === 'true' ? (
+              <div>
+                  <Typography variant="subtitle1" noWrap>
+                  { localStorage.getItem('username')}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+          { localStorage.getItem('username')}
           </Typography>
+
+              </div>
+
+            ) : (
+              <div>
+                 <Typography variant="subtitle1" noWrap>
+                   You are not logged in.
+                 </Typography>
+                
+              </div>
+
+            )
+          }
+        
         </Box>
 
         <Divider sx={{ my: 1 }} />
 
-        {MENU_OPTIONS.map((option) => (
+        {/* {MENU_OPTIONS.map((option) => (
           <MenuItem
             key={option.label}
             to={option.linkTo}
@@ -107,10 +145,10 @@ export default function AccountPopover() {
 
             {option.label}
           </MenuItem>
-        ))}
+        ))} */}
 
         <Box sx={{ p: 2, pt: 1.5 }}>
-          <Button fullWidth color="inherit" variant="outlined">
+          <Button fullWidth color="inherit" variant="outlined" onClick={logOut}>
             Logout
           </Button>
         </Box>

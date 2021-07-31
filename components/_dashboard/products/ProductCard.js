@@ -76,10 +76,10 @@ export default function ShopProductCard({ product }) {
                 textDecoration: 'line-through'
               }}
             >
-              {salePrice && fCurrency(salePrice)}
+              {price && fCurrency(price)}
             </Typography>
             &nbsp;
-            {fCurrency(price)}
+            {fCurrency(salePrice)}
           </Typography>
         </Stack>
       </Stack>

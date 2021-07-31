@@ -9,6 +9,7 @@ import Page from '../components/Page';
 import { MHidden } from '../components/@material-extend';
 import { LoginForm } from '../components/authentication/login';
 import AuthSocial from '../components/authentication/AuthSocial';
+import { useRouter } from 'next/router';
 
 // ----------------------------------------------------------------------
 
@@ -40,6 +41,11 @@ const ContentStyle = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function Login() {
+  const router = useRouter();
+
+  const handleRegister = () => {
+    router.push("register");
+  };
   return (
     <RootStyle title="Login | Minimal-UI">
       <AuthLayout>
@@ -73,7 +79,7 @@ export default function Login() {
           <MHidden width="smUp">
             <Typography variant="body2" align="center" sx={{ mt: 3 }}>
               Don’t have an account?&nbsp;
-              <Link variant="subtitle2" >
+              <Link variant="subtitle2" onClick={handleRegister} >
                 Get started
               </Link>
             </Typography>

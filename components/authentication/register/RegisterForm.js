@@ -53,8 +53,8 @@ export default function RegisterForm() {
      }
      if(data.register.success){
        localStorage.setItem('register',data.register.success);
-       alert('You have registered successfully.')
-       router.push('products');
+       alert('You have registered successfully.');
+       router.reload();
     }
 
     

@@ -57,7 +57,7 @@ export default function LoginForm() {
        localStorage.setItem('login',data.tokenAuth.success);
        localStorage.setItem('userid',data.tokenAuth.user.id);
        localStorage.setItem('username',data.tokenAuth.user.username);
-       router.push('products');
+       router.reload();
        console.log(data)
      }
      

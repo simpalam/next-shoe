@@ -89,7 +89,7 @@ export default function PdDetail({ product, pdDetail }) {
     setProductsize(size);
     let pd={
       name:productname,
-      price:productprice,
+      price:salePrice,
       colorname:colorname,
       colorvalue:colorvalue,
       size:size,
@@ -138,7 +138,7 @@ export default function PdDetail({ product, pdDetail }) {
 
                         let pd={
                           name:productname,
-                          price:productprice,
+                          price:salePrice,
                           colorname:colorname,
                           colorvalue:colorvalue,
                           size:productsize,
@@ -172,7 +172,7 @@ export default function PdDetail({ product, pdDetail }) {
                   <Typography variant="h6" noWrap>
                     Price :
                   </Typography>
-                  <Typography>Rs.{productprice}</Typography>
+                  <Typography>Rs.{salePrice}</Typography>
                 </Stack>
 
                 <Typography variant="subtitle2" noWrap>
