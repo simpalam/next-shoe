@@ -1,4 +1,4 @@
-import { Container, Stack, Typography, Grid, Button } from "@material-ui/core";
+import { Container, Stack, Typography, Grid, Button, Dialog, DialogTitle, DialogActions, DialogContent, CircularProgress } from "@material-ui/core";
 import React, { useState, useEffect } from "react";
 import Page from "../../components/Page";
 
@@ -45,6 +45,8 @@ import Checkout from "../../components/productdetails/checkout";
 import client from "../../apollo-client";
 import { GET_ONE_PRODUCT } from "../../graphql/query/products.query";
 import { useRouter } from "next/router";
+import { CREATE_ORDER } from "../../graphql/mutation/order.mutation";
+import Link from 'next/link'
 
 function getSteps() {
   return ["Product details", "Delivery details", "Payment method"];
@@ -97,6 +99,7 @@ export default function ProductDertail({ product }) {
   });
 
   const [login, setLogin] = useState("");
+  const [userid,setUserid] = useState('');
 
   useEffect(() => {
     // if (isOpenSidebar) {
@@ -104,7 +107,8 @@ export default function ProductDertail({ product }) {
     // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
     setLogin(localStorage.getItem("login"));
-  }, [login]);
+    setUserid(localStorage.getItem('userid'));
+  }, [login,userid]);
 
   const [activeStep, setActiveStep] = React.useState(0);
   const [completed, setCompleted] = React.useState(new Set());
@@ -169,11 +173,50 @@ export default function ProductDertail({ product }) {
     setActiveStep(step);
   };
 
-  const handleComplete = () => {
-    const newCompleted = new Set(completed);
-    newCompleted.add(activeStep);
-    setCompleted(newCompleted);
+  const [opend,setOpend]=useState(false);
+  const [openproc,setOpenproc]=useState(false);
 
+  const handleComplete = async () => {
+
+    setOpenproc(true);
+    
+    const {data,error,loading}= await client.mutate({
+      mutation:CREATE_ORDER,
+      variables:{
+        userid:userid,
+        productName:productdetail.name,
+        image:`https://institute-env.s3.amazonaws.com/static/${productdetail.image}`,
+        color:productdetail.colorname,
+        size:productdetail.size,
+        price:productdetail.price,
+        deliverycharge:'0',
+        status:'placed',
+        name:cstdetail.firstName,
+        email:cstdetail.email,
+        phone:cstdetail.phone,
+        address:cstdetail.address
+      }
+    });
+
+    if(error){
+      console.error(error);
+      return null
+    }
+    if(loading){
+
+      return <h2>Order Processing</h2>
+    }
+    if(data.createOrder.order.userId===userid){
+      const newCompleted = new Set(completed);
+      newCompleted.add(activeStep);
+      setCompleted(newCompleted);
+      setOpenproc(false);
+      setOpend(true);
+  
+    //  router.basePath();
+    }
+
+   
     /**
      * Sigh... it would be much nicer to replace the following if conditional with
      * `if (!this.allStepsComplete())` however state is not set when we do this,
@@ -240,6 +283,28 @@ export default function ProductDertail({ product }) {
 
   return (
     <div>
+      <Dialog open={opend}>
+        <DialogTitle>
+          Order Placed successfully.
+        </DialogTitle>
+        <DialogActions>
+          <Link 
+          href="/products">
+            <Button>
+            See more products.
+            </Button>
+          </Link>
+        </DialogActions>
+
+      </Dialog>
+      <Dialog open={openproc}>
+        <DialogTitle>
+          Order processing, please wait....
+        </DialogTitle>
+      <DialogContent>
+        <CircularProgress />
+      </DialogContent>
+      </Dialog>
       <Page title="Product Detail">
         <Container>
           <Stepper alternativeLabel nonLinear activeStep={activeStep}>

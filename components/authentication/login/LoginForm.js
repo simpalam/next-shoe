@@ -6,24 +6,31 @@ import eyeFill from '@iconify/icons-eva/eye-fill';
 import eyeOffFill from '@iconify/icons-eva/eye-off-fill';
 // material
 import {
-  Link,
   Stack,
   Checkbox,
   TextField,
   IconButton,
   InputAdornment,
-  FormControlLabel
+  FormControlLabel,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  DialogContent
 } from '@material-ui/core';
 import { LoadingButton } from '@material-ui/lab';
 import client from '../../../apollo-client';
 import { LOGIN_USER } from '../../../graphql/mutation/user.mutation';
 import { useRouter } from 'next/dist/client/router';
+import Link from 'next/link'
 
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
   // const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const[open,setOpen]=useState(false);
 
   const router=useRouter();
 
@@ -57,8 +64,15 @@ export default function LoginForm() {
        localStorage.setItem('login',data.tokenAuth.success);
        localStorage.setItem('userid',data.tokenAuth.user.id);
        localStorage.setItem('username',data.tokenAuth.user.username);
-       router.reload();
+       alert('Welcome you have sign in successfully.');
+       
+       router.back();
+      //  router.push('products')
        console.log(data)
+     }
+     if(!data.tokenAuth.success){
+       alert('Please enter valid credential. Dear you have missed something.');
+       router.reload();
      }
      
     }
@@ -70,7 +84,37 @@ export default function LoginForm() {
     setShowPassword((show) => !show);
   };
 
+  const handleClose=()=>{
+    setOpen(false);
+  }
+  const handleOpen=()=>{
+    setOpen(true);
+  }
+
   return (
+    <div>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>
+          Password reset
+        </DialogTitle>
+        <DialogContent>
+          <Typography gutterBottom>
+            Password reset email may go to spam emails.
+            So please check your spam folder.
+          </Typography>
+
+        </DialogContent>
+        <DialogActions>
+          <Link
+          href="https://django-shoe.herokuapp.com/accounts/password_reset/"
+          >
+          <Button>
+            Ok , Let's Go
+          </Button>
+          </Link>
+        </DialogActions>
+
+      </Dialog>
     <FormikProvider value={formik}>
       <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
         <Stack spacing={3}>
@@ -109,10 +153,18 @@ export default function LoginForm() {
             control={<Checkbox {...getFieldProps('remember')} checked={values.remember} />}
             label="Remember me"
           />
+          <Typography 
+          onClick={handleOpen}>
+          Forgot password?
 
-          <Link  variant="subtitle2" to="#">
+          </Typography>
+
+          {/* <Link 
+          onClick={handleOpen}
+          // href="https://django-shoe.herokuapp.com/accounts/password_reset/"
+           >
             Forgot password?
-          </Link>
+          </Link> */}
         </Stack>
 
         <LoadingButton
@@ -126,5 +178,6 @@ export default function LoginForm() {
         </LoadingButton>
       </Form>
     </FormikProvider>
+    </div>
   );
 }

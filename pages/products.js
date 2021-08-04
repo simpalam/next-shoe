@@ -41,6 +41,9 @@ export async function getServerSideProps(){
   }
 
 }
+
+//-----------------------------------------------------------------------
+
 export default function EcommerceShop({products}) {
   const [openFilter, setOpenFilter] = useState(false);
 

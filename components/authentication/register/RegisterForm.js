@@ -53,8 +53,16 @@ export default function RegisterForm() {
      }
      if(data.register.success){
        localStorage.setItem('register',data.register.success);
+       console.log(data);
        alert('You have registered successfully.');
        router.reload();
+    }
+    if(!data.register.success){
+      console.log(data);
+      alert("Please enter valid credential.");
+     
+      router.reload();
+
     }
 
     
