@@ -127,7 +127,7 @@ export default function User() {
   useEffect(() => {
     setUserid(localStorage.getItem("userid"));
     async function fetchOrders() {
-      const { data, error, loading } = await client.query({
+      const { data, errors, loading } = await client.query({
         query: ORDERS_BY_USERID,
         variables: { userid: "VXNlck5vZGU6MTA=" },
       });
@@ -135,7 +135,7 @@ export default function User() {
       if (loading) {
         return <h2>Loading data</h2>;
       }
-      if (error) {
+      if (errors) {
         console.error(error);
         return null;
       }

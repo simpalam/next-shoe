@@ -372,13 +372,17 @@ export default function ProductDertail({ product }) {
                                 Place Order
                               </Button>
                             ) : (
+                              <Link 
+                              href="/login"
+                              >
                               <Button
                                 variant="contained"
                                 color="primary"
-                                onClick={handleLogin}
+                                // onClick={handleLogin}
                               >
                                 Please Login
                               </Button>
+                              </Link>
                             )}
                           </div>
                         ) : (

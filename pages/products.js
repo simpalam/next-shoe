@@ -22,14 +22,14 @@ import client from '../apollo-client';
 
 // ----------------------------------------------------------------------
 export async function getServerSideProps(){
-  const {data,error,loading} = await client.query({
+  const {data,errors,loading} = await client.query({
     query:GET_PRODUCTS
   });
   
   if(loading){
     return <h2>Loading ... Please wait.</h2>
   }
-  if(error){
+  if(errors){
     console.error(error);
     return null
   }
