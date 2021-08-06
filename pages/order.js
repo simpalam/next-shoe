@@ -129,7 +129,7 @@ export default function User() {
     async function fetchOrders() {
       const { data, errors, loading } = await client.query({
         query: ORDERS_BY_USERID,
-        variables: { userid: "VXNlck5vZGU6MTA=" },
+        variables: { userid: userid },
       });
 
       if (loading) {
@@ -139,7 +139,7 @@ export default function User() {
         console.error(error);
         return null;
       }
-      if (data) {
+      if (data.allOrdeers.edges.length > 0) {
         setOrderlist(data.allOrdeers.edges);
         setOrderbool(true);
         console.log(data);

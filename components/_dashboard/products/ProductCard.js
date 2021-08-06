@@ -28,7 +28,7 @@ ShopProductCard.propTypes = {
   product: PropTypes.object
 };
 
-export default function ShopProductCard({ product }) {
+export default function ShopProductCard({ product,handleCartProduct }) {
   const { name, image, price, color, status, salePrice,id } = product;
 
   return (
@@ -63,7 +63,7 @@ export default function ShopProductCard({ product }) {
 
         <Stack direction="row" alignItems="center" justifyContent="space-between">
          
-          <IconButton onClick={()=>alert('clicked')} color="primary" aria-label="add to shopping cart">
+          <IconButton onClick={()=>handleCartProduct(product)} color="primary" aria-label="add to shopping cart">
         <AddShoppingCartIcon />
       </IconButton>
         
