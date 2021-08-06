@@ -1,3 +1,4 @@
+import { filter } from "lodash";
 import {
   CircularProgress,
   Container,
@@ -6,22 +7,66 @@ import {
   Stack,
   DialogActions,
   Button,
+  Typography,
 } from "@material-ui/core";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import client from "../apollo-client";
 import Page from "../components/Page";
+import CartListToolbar from "../components/_dashboard/cartproducts/CartListToolbar";
 import CartProductList from "../components/_dashboard/cartproducts/CartProductList";
 import { ProductList } from "../components/_dashboard/products";
 import { DELETE_CARTPRODUCT } from "../graphql/mutation/cartproduct.mutation";
 import { CARTPRODUCTS_BY_USERID } from "../graphql/query/cartproduct.query";
 
+//------------------------------
+
+function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+  
+  function getComparator(order, orderBy) {
+    return order === "desc"
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy);
+  }
+  
+  function applySortFilter(array, comparator, query) {
+    const stabilizedThis = array.map((el, index) => [el, index]);
+    stabilizedThis.sort((a, b) => {
+      const order = comparator(a[0], b[0]);
+      if (order !== 0) return order;
+      return a[1] - b[1];
+    });
+    if (query) {
+      return filter(
+        array,
+        (_user) =>
+          _user.node.name.toLowerCase().indexOf(query.toLowerCase()) !== -1
+      );
+    }
+    return stabilizedThis.map((el) => el[0]);
+  }
+  
+
 export default function MyCart() {
   const [userid, setUserid] = useState(null);
   const [cartproducts, setCartproducts] = useState(null);
   const [iscart, setIscart] = useState(false);
-
   const router = useRouter();
+  const [filterName,setFilterName]=useState("");
+  const [order, setOrder] = useState("asc");
+  const [orderBy, setOrderBy] = useState("name");
+
+  const handleFilterByName= (event)=>{
+      setFilterName(event.target.value);
+  }
 
   async function fetchCartproducts() {
     const { data, errors, loading } = await client.query({
@@ -75,6 +120,13 @@ export default function MyCart() {
     return <h2>You have not added any product to cart.</h2>;
   }
 
+  
+  const filteredProducts = applySortFilter(
+    cartproducts,
+    getComparator(order, orderBy),
+    filterName
+  );
+
   return (
     <div>
       <Dialog open={isDelete}>
@@ -100,15 +152,19 @@ export default function MyCart() {
         <Container>
           <Stack
             direction="row"
-            flexWrap="wrap-reverse"
+           // flexWrap="wrap-reverse"
             alignItems="center"
-            justifyContent="flex-end"
+            justifyContent="space-between"
             sx={{ mb: 5 }}
           >
-            Some my cart sorting things.
+        
+           <CartListToolbar
+           filterName={filterName}
+           onFilterName={handleFilterByName}
+           />
           </Stack>
           <CartProductList
-            cartproducts={cartproducts}
+            cartproducts={filteredProducts}
             handledeleteCartProduct={handledeleteCartProduct}
           />
         </Container>
